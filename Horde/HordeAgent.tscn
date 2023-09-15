@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="GDScript" id=1]
+resource_name = "HordeAgent"
+script/source = "extends Area2D
+
+func _ready():
+	rotation_degrees = Gl.randint(-180, 180)
+	
+onready var speed = -Gl.randint(1, 2)
+var chance = 5
+
+func _process(_delta):
+	rotation_degrees += Gl.randint(-2, 2)
+	if Gl.randint(1, 1000) <= chance:
+		rotation_degrees += Gl.randint(-180, 180)
+	#if len(get_overlapping_areas()) < 1:
+	position += Vector2(0, speed).rotated(rotation)
+	if position.x >= OS.window_size.x:
+		position.x = 5
+	elif position.x < 0:
+		position.x = OS.window_size.x - 5
+	if position.y >= OS.window_size.y:
+		position.y = 5
+	elif position.y < 0:
+		position.y = OS.window_size.y - 5
+	for area in get_overlapping_areas():
+		rotation_degrees = (area.rotation_degrees + rotation_degrees) / 2
+		#if (position - area.position).x < 6 and (position - area.position).y < 6:
+		position += (position - area.position).normalized() / 4
+		#else:
+		#position -= (position - area.position).normalized() * 2
+"
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 47.0106
+
+[node name="Agent" type="Area2D" groups=["agent"]]
+scale = Vector2( 0.2, 0.2 )
+script = SubResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 2 )
+
+[node name="Polygon2D" type="Polygon2D" parent="CollisionShape2D"]
+z_index = -1
+color = Color( 1, 1, 1, 0.188235 )
+polygon = PoolVector2Array( -45, 0, -35, -30, 0, -45, 35, -30, 45, 0, 35, 30, 0, 45, -35, 30 )
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+color = Color( 1, 1, 1, 0.686275 )
+polygon = PoolVector2Array( -18, 0, -13, -13, 0, -18, 13, -13, 18, 0, 13, 13, 0, 18, -13, 13 )

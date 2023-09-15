@@ -1,0 +1,116 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+resource_name = "horde"
+script/source = "extends Node2D
+
+onready var agent = preload(\"res://Pandemia/Agent.tscn\").instance()
+
+func _on_Menu_pressed():
+	$Menu/Int.visible = !$Menu/Int.visible
+
+
+func _on_Spawn_pressed():
+	for i in range($Menu/Int/Amount.value):
+		agent = preload(\"res://Horde/HordeAgent.tscn\").instance()
+		agent.position = Vector2(Gl.randint(0, OS.window_size.x), Gl.randint(0, OS.window_size.y))
+		agent.scale = Vector2($Menu/Int/Scale.value, $Menu/Int/Scale.value)
+		agent.chance = $Menu/Int/Chance.value
+		agent.get_node(\"CollisionShape2D\").scale = Vector2($Menu/Int/Radius.value, $Menu/Int/Radius.value)
+		add_child(agent)
+
+func _process(delta):
+	if $Menu/Int.visible:
+		$Menu/Int/Scale_lbl.text = str($Menu/Int/Scale.value)
+		$Menu/Int/Radius_lbl.text = str($Menu/Int/Radius.value)
+		$Menu/Int/Chance_lbl.text = str($Menu/Int/Chance.value)
+		$Menu/Int/Amount_lbl.text = str($Menu/Int/Amount.value)
+
+func _on_Delete_pressed():
+	Gl.deleteAllGroup(\"agent\")
+"
+
+[node name="Pandemia" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="Menu" type="Button" parent="."]
+margin_right = 21.0
+margin_bottom = 20.0
+text = "Menu"
+
+[node name="Int" type="Control" parent="Menu"]
+
+[node name="Spawn" type="Button" parent="Menu/Int"]
+margin_left = 50.0
+margin_right = 102.0
+margin_bottom = 20.0
+text = "Spawn"
+
+[node name="Radius" type="HSlider" parent="Menu/Int"]
+margin_top = 72.0
+margin_right = 104.0
+margin_bottom = 88.0
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 0.3
+
+[node name="Scale" type="HSlider" parent="Menu/Int"]
+margin_top = 40.0
+margin_right = 104.0
+margin_bottom = 56.0
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 0.2
+
+[node name="Amount" type="HSlider" parent="Menu/Int"]
+margin_top = 24.0
+margin_right = 104.0
+margin_bottom = 40.0
+min_value = 10.0
+max_value = 2000.0
+step = 10.0
+value = 500.0
+
+[node name="Chance" type="HSlider" parent="Menu/Int"]
+margin_top = 56.0
+margin_right = 136.0
+margin_bottom = 72.0
+min_value = 1.0
+max_value = 1000.0
+value = 5.0
+
+[node name="Radius_lbl" type="Label" parent="Menu/Int"]
+margin_left = 104.0
+margin_top = 72.0
+margin_right = 128.0
+margin_bottom = 88.0
+
+[node name="Chance_lbl" type="Label" parent="Menu/Int"]
+margin_left = 136.0
+margin_top = 56.0
+margin_right = 160.0
+margin_bottom = 72.0
+
+[node name="Scale_lbl" type="Label" parent="Menu/Int"]
+margin_left = 104.0
+margin_top = 40.0
+margin_right = 128.0
+margin_bottom = 56.0
+
+[node name="Amount_lbl" type="Label" parent="Menu/Int"]
+margin_left = 104.0
+margin_top = 24.0
+margin_right = 128.0
+margin_bottom = 40.0
+
+[node name="Delete" type="Button" parent="Menu/Int"]
+margin_left = 104.0
+margin_right = 128.0
+margin_bottom = 20.0
+text = "del"
+
+[connection signal="pressed" from="Menu" to="." method="_on_Menu_pressed"]
+[connection signal="pressed" from="Menu/Int/Spawn" to="." method="_on_Spawn_pressed"]
+[connection signal="pressed" from="Menu/Int/Delete" to="." method="_on_Delete_pressed"]

@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="GDScript" id=1]
+resource_name = "agent"
+script/source = "extends Area2D
+
+var infected = false
+var chance = 5
+
+func _ready():
+	rotation_degrees = Gl.randint(0, 360)
+	monitoring = infected
+	monitorable = !infected
+
+func _process(_delta):
+	rotation_degrees += Gl.randint(-10, 10)
+	position += Vector2(0, -5).rotated(rotation)
+	if position.x >= OS.window_size.x:
+		position.x = 5
+	elif position.x < 0:
+		position.x = OS.window_size.x - 5
+	if position.y >= OS.window_size.y:
+		position.y = 5
+	elif position.y < 0:
+		position.y = OS.window_size.y - 5
+	if infected:
+		for area in get_overlapping_areas():
+			if Gl.randint(1, 1000) <= chance:
+				area.infected = true
+				area.monitoring = true
+				area.monitorable = false
+	$Polygon2D.color = Color(0.1+0.7*int(infected), 0.8-0.7*int(infected), 0.1)
+"
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 47.0106
+
+[node name="Agent" type="Area2D" groups=["agent"]]
+scale = Vector2( 0.2, 0.2 )
+monitoring = false
+script = SubResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 2 )
+
+[node name="Polygon2D" type="Polygon2D" parent="CollisionShape2D"]
+z_index = -1
+color = Color( 1, 1, 1, 0.0352941 )
+polygon = PoolVector2Array( -45, 0, -35, -30, 0, -45, 35, -30, 45, 0, 35, 30, 0, 45, -35, 30 )
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+polygon = PoolVector2Array( -18, 0, -13, -13, 0, -18, 13, -13, 18, 0, 13, 13, 0, 18, -13, 13 )
